@@ -41,6 +41,8 @@ class Main_Window(QMainWindow):
           QMainWindow.__init__(self)
           self.ui = Ui_MainWindow()
           self.ui.setupUi(self)
+          
+          self.window.setWindowIcon(QIcon("icons/Icon.ico"))
           self.ui.centralwidget.setMinimumSize(800, 572)
           self.setWindowFlag(Qt.FramelessWindowHint)
           self.setAttribute(Qt.WA_TranslucentBackground)
@@ -76,7 +78,8 @@ class SplashScreen(QMainWindow):
           QMainWindow.__init__(self)
           self.ui = Ui_SplashScreen()
           self.ui.setupUi(self)
-
+          
+          self.window.setWindowIcon(QIcon("icons/Icon.ico"))
           self.setWindowFlag(Qt.FramelessWindowHint)
           self.setAttribute(Qt.WA_TranslucentBackground)
           self.shadow = QGraphicsDropShadowEffect(self)
@@ -134,7 +137,7 @@ class LoginWindow:
                }
           """)
 
-          self.window.setWindowIcon(QIcon("WolfCoder.ico"))
+          self.window.setWindowIcon(QIcon("icons/Icon.ico"))
 
           self.userbox = QLineEdit()
           self.passbox = QLineEdit()
