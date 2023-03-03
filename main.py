@@ -195,9 +195,9 @@ class LoginWindow:
           userel = self.userbox.text()
           passel = self.passbox.text()
           mailel = self.mailbox.text()
-          cnx = pymysql.connect(user='root', password='esadphpmyadmin', host='localhost', database='blogdb')
+          cnx = pymysql.connect(user='{youruser}', password='{yourpassword}', host='{yourhost}', database='{yourdatabase}')
           imlec = cnx.cursor()
-          find_user = ("SELECT * FROM eusers WHERE EUsername = %s AND EUPassword = %s AND EUEMail = %s")
+          find_user = ("SELECT * FROM eusers WHERE username = %s AND password = %s AND mail = %s")
           imlec.execute(find_user, [(self.userbox.text()), (self.passbox.text()), (self.mailbox.text())])
           result = imlec.fetchall()
           msg = QMessageBox()
@@ -226,7 +226,7 @@ class LoginWindow:
                     msg.exec_()
      def new_account(self):
           msg2 = QMessageBox()
-          cnx = pymysql.connect(user='root', password='esadphpmyadmin', host='localhost', database='blogdb')
+          
           cursor2 = cnx.cursor()
           if self.userbox.text() == "" or self.passbox.text() == "" or self.mailbox.text() == "":
                msg3 = QMessageBox()
@@ -237,14 +237,14 @@ class LoginWindow:
           else:
                cursor2.execute("SELECT * FROM eusers WHERE EUEMail = %s", self.mailbox.text())
                row = cursor2.fetchone()
-               
+               cnx = pymysql.connect(user='{youruser}', password='{yourpassword}', host='{yourhost}', database='{yourdatabase}')
                if row!= None:
                     msg2.setText("This email already exists")
                     msg2.setIcon(QMessageBox.Warning)
                     msg2.addButton("Okey", QMessageBox.YesRole)
                     msg2.exec_()
                else:
-                    cursor2.execute("INSERT INTO eusers VALUES(%s, %s, %s)", (self.userbox.text(),self.passbox.text(),self.mailbox.text()))
+                    cursor2.execute("INSERT INTO users VALUES(%s, %s, %s)", (self.userbox.text(),self.passbox.text(),self.mailbox.text()))
 
                     cnx.commit()
                     cnx.close()
