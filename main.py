@@ -28,7 +28,7 @@ import pymysql
 import webbrowser  
 
 
-cnx = pymysql.connect(user='root', password='esadphpmyadmin', host='localhost', database='blogdb')
+cnx = pymysql.connect(user='{youruser}', password='{yourpassword}', host='{yourhost}', database='{yourdatabase}')
 
 cursor = cnx.cursor()
 
@@ -235,7 +235,7 @@ class LoginWindow:
                msg3.addButton("Okey", QMessageBox.YesRole)
                msg3.exec_()
           else:
-               cursor2.execute("SELECT * FROM eusers WHERE EUEMail = %s", self.mailbox.text())
+               cursor2.execute("SELECT * FROM users WHERE mail = %s", self.mailbox.text())
                row = cursor2.fetchone()
                cnx = pymysql.connect(user='{youruser}', password='{yourpassword}', host='{yourhost}', database='{yourdatabase}')
                if row!= None:
