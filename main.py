@@ -198,14 +198,14 @@ class LoginWindow:
           userel = self.userbox.text()
           passel = self.passbox.text()
           mailel = self.mailbox.text()
-          cnx = pymysql.connect(user='{youruser}', password='{yourpassword}', host='{yourhost}', database='{yourdatabase}')
+          global cnx
           imlec = cnx.cursor()
           find_user = ("SELECT * FROM eusers WHERE username = %s AND password = %s AND mail = %s")
           imlec.execute(find_user, [(self.userbox.text()), (self.passbox.text()), (self.mailbox.text())])
           result = imlec.fetchall()
           msg = QMessageBox()
           msg.setWindowTitle("System")
-          msg.setStyleSheet(u"QLabel{min-width:120 px; font-size: 12px;} QPushButton{ width:60px; font-size: 9px; }");
+          msg.setStyleSheet(u"QLabel{min-width:120 px; font-size: 12px;} QPushButton{ width:60px; font-size: 9px; }")
           if self.userbox.text() == "" or self.passbox.text() == "" or self.mailbox.text() == "":
                msg.setText("Error")
                msg.setIcon(QMessageBox.Warning)
