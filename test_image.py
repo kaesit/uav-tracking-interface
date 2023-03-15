@@ -5,8 +5,8 @@ img = cv2.imread('images/uav_in_air5.jpg')
 with open('model2/classes.txt', 'r') as f:
     classes = f.read().splitlines()
 
-model_path = 'yolov4-obj_last.weights'
-config_path = 'yolov4-obj.cfg'
+model_path = 'model2/yolov4-obj_last.weights'
+config_path = 'model2/yolov4-obj.cfg'
 net = cv2.dnn.readNetFromDarknet(config_path, model_path)
 
 model = cv2.dnn_DetectionModel(net)
