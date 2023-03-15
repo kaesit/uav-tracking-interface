@@ -4,7 +4,7 @@ from PySide2.QtGui import *
 from PySide2.QtWidgets import *
 
 
-#?PySide6
+#?PySide2
 import platform
 from PySide2 import QtCore, QtGui, QtWidgets
 from PySide2.QtGui import QGuiApplication
@@ -230,7 +230,7 @@ class LoginWindow:
      def new_account(self):
           msg2 = QMessageBox()
           
-          cursor2 = cnx.cursor()
+          cursor = cnx.cursor()
           if self.userbox.text() == "" or self.passbox.text() == "" or self.mailbox.text() == "":
                msg3 = QMessageBox()
                msg3.setText("Error")
@@ -238,8 +238,8 @@ class LoginWindow:
                msg3.addButton("Okey", QMessageBox.YesRole)
                msg3.exec_()
           else:
-               cursor2.execute("SELECT * FROM users WHERE mail = %s", self.mailbox.text())
-               row = cursor2.fetchone()
+               cursor.execute("SELECT * FROM users WHERE mail = %s", self.mailbox.text())
+               row = cursor.fetchone()
                cnx = pymysql.connect(user='{youruser}', password='{yourpassword}', host='{yourhost}', database='{yourdatabase}')
                if row!= None:
                     msg2.setText("This email already exists")
@@ -247,7 +247,7 @@ class LoginWindow:
                     msg2.addButton("Okey", QMessageBox.YesRole)
                     msg2.exec_()
                else:
-                    cursor2.execute("INSERT INTO users VALUES(%s, %s, %s)", (self.userbox.text(),self.passbox.text(),self.mailbox.text()))
+                    cursor.execute("INSERT INTO users VALUES(%s, %s, %s)", (self.userbox.text(),self.passbox.text(),self.mailbox.text()))
 
                     cnx.commit()
                     cnx.close()
