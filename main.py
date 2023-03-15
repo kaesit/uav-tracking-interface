@@ -19,8 +19,6 @@ from themes.ui_splash_screen import Ui_SplashScreen
 
 from themes.ui_main_window import Ui_MainWindow
 
-from themes.circular_progress import CircularProgress
-
 from ai import AI
 
 import pymysql
