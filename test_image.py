@@ -7,7 +7,7 @@ with open('model2/classes.txt', 'r') as f:
 
 model_path = 'model2/yolov4-obj_last.weights'
 config_path = 'model2/yolov4-obj.cfg'
-net = cv2.dnn.readNetFromDarknet(config_path, model_path)
+net = cv2.dnn.readNet(config_path, model_path)
 
 model = cv2.dnn_DetectionModel(net)
 model.setInputParams(scale=1 / 255, size=(410, 410), swapRB=True)
