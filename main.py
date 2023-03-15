@@ -229,7 +229,7 @@ class LoginWindow:
                     msg.exec_()
      def new_account(self):
           msg2 = QMessageBox()
-          
+          global cnx
           cursor = cnx.cursor()
           if self.userbox.text() == "" or self.passbox.text() == "" or self.mailbox.text() == "":
                msg3 = QMessageBox()
