@@ -26,7 +26,7 @@ import pymysql
 import webbrowser  
 
 
-cnx = pymysql.connect(user='root', password='esadphpmyadmin', host='localhost', database='blogdb')
+cnx = pymysql.connect(user='', password='', host='', database='')
 
 cursor = cnx.cursor()
 
@@ -202,7 +202,7 @@ class ControlStation:
           mailel = self.mailbox.text()
           global cnx
           imlec = cnx.cursor()
-          find_user = ("SELECT * FROM eusers WHERE EUsername = %s AND EUPassword = %s AND EUEMail = %s")
+          find_user = ("SELECT * FROM  WHERE  = %s AND  = %s AND  = %s")
           imlec.execute(find_user, [(self.userbox.text()), (self.passbox.text()), (self.mailbox.text())])
           result = imlec.fetchall()
           msg = QMessageBox()
@@ -240,7 +240,7 @@ class ControlStation:
                msg3.addButton("Okey", QMessageBox.YesRole)
                msg3.exec_()
           else:
-               cursor.execute("SELECT * FROM eusers WHERE EUEMail = %s", self.mailbox.text())
+               cursor.execute("SELECT * FROM  WHERE  = %s", self.mailbox.text())
                row = cursor.fetchone()
                
                if row!= None:
@@ -249,7 +249,7 @@ class ControlStation:
                     msg2.addButton("Okey", QMessageBox.YesRole)
                     msg2.exec_()
                else:
-                    cursor.execute("INSERT INTO eusers VALUES(%s, %s, %s)", (self.userbox.text(),self.passbox.text(),self.mailbox.text()))
+                    cursor.execute("INSERT INTO  VALUES(%s, %s, %s)", (self.userbox.text(),self.passbox.text(),self.mailbox.text()))
 
                     cnx.commit()
                     cnx.close()
