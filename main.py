@@ -4,7 +4,7 @@ from PySide2.QtGui import *
 from PySide2.QtWidgets import *
 
 
-#?PySide2
+#?PySide6
 import platform
 from PySide2 import QtCore, QtGui, QtWidgets
 from PySide2.QtGui import QGuiApplication
@@ -19,14 +19,14 @@ from themes.ui_splash_screen import Ui_SplashScreen
 
 from themes.ui_main_window import Ui_MainWindow
 
-from ai import AI
+import uav
 
 import pymysql
 
 import webbrowser  
 
 
-cnx = pymysql.connect(user='{youruser}', password='{yourpassword}', host='{yourhost}', database='{yourdatabase}')
+cnx = pymysql.connect(user='root', password='esadphpmyadmin', host='localhost', database='blogdb')
 
 cursor = cnx.cursor()
 
@@ -34,13 +34,13 @@ counter = 0
 
 kontrol = True
 
-class Main_Window(QMainWindow):
+class MainWindow(QMainWindow):
      def __init__(self):
           QMainWindow.__init__(self)
           self.ui = Ui_MainWindow()
           self.ui.setupUi(self)
-          
-          self.window.setWindowIcon(QIcon("icons/Icon.ico"))
+
+          self.setWindowIcon(QIcon("icons/EsadIcon.ico"))
           self.ui.centralwidget.setMinimumSize(800, 572)
           self.setWindowFlag(Qt.FramelessWindowHint)
           self.setAttribute(Qt.WA_TranslucentBackground)
@@ -57,9 +57,11 @@ class Main_Window(QMainWindow):
           self.ui.btnMissile.clicked.connect(self.connect_to_ai)
           self.ui.btnLogout.clicked.connect(self.close_all_windows)
           self.ui.btnLink.clicked.connect(self.contact_us)
-
+          self.show()
      def connect_to_ai(self):
-          AI()
+          uav.Start()
+          #pass
+     
      def close_all_windows(self):
           sys.exit(0)
      def center(self):
@@ -70,14 +72,15 @@ class Main_Window(QMainWindow):
      def contact_us(self):
           url = "https://github.com/kaesit"
           webbrowser.open(url, new=0, autoraise=True)
-          
-class SplashScreen(QMainWindow):
+     
+class LoadMenu(QMainWindow):
      def __init__(self):
           QMainWindow.__init__(self)
           self.ui = Ui_SplashScreen()
           self.ui.setupUi(self)
-          
-          self.window.setWindowIcon(QIcon("icons/Icon.ico"))
+
+
+          self.setWindowIcon(QIcon("icons/EsadIcon.ico"))
           self.setWindowFlag(Qt.FramelessWindowHint)
           self.setAttribute(Qt.WA_TranslucentBackground)
           self.shadow = QGraphicsDropShadowEffect(self)
@@ -92,15 +95,16 @@ class SplashScreen(QMainWindow):
           self.timer.timeout.connect(self.progress)
           # TIMER IN MILLISECONDS
           self.timer.start(35)
+          
 
           # CHANGE DESCRIPTION
 
           # Initial Text
-          self.ui.label_description.setText("<strong>PROGRAMIMA</strong> HOŞ GELDİNİZ")
+          self.ui.label_description.setText("<strong>WELCOME</strong> TO <strong>UAV TRACKING SYSTEM</strong>")
 
           # Change Texts
-          QtCore.QTimer.singleShot(1500, lambda: self.ui.label_description.setText("<strong>ARAYÜZ</strong> Yükleniyor"))
-          QtCore.QTimer.singleShot(3000, lambda: self.ui.label_description.setText("<strong>Yapay Zeka</strong> Yükleniyor"))
+          QtCore.QTimer.singleShot(1500, lambda: self.ui.label_description.setText("<strong>INTERFACE</strong> is loading..."))
+          QtCore.QTimer.singleShot(3000, lambda: self.ui.label_description.setText("<strong>AI</strong> is loading..."))
           self.show()
      def progress(self):
 
@@ -115,7 +119,7 @@ class SplashScreen(QMainWindow):
             self.timer.stop()
             self.close()
             # SHOW MAIN WINDOW
-            self.main = Main_Window()
+            self.main = MainWindow()
             self.main.show()
 
             # CLOSE SPLASH SCREEN
@@ -124,7 +128,7 @@ class SplashScreen(QMainWindow):
         # INCREASE COUNTER
         counter += 1
 
-class LoginWindow:
+class ControlStation:
      def __init__(self):
           self.window = QWidget()
           self.window.setFixedSize(330, 160)
@@ -135,7 +139,7 @@ class LoginWindow:
                }
           """)
 
-          self.window.setWindowIcon(QIcon("icons/Icon.ico"))
+          self.window.setWindowIcon(QIcon("icons/EsadIcon.ico"))
 
           self.userbox = QLineEdit()
           self.passbox = QLineEdit()
@@ -198,7 +202,7 @@ class LoginWindow:
           mailel = self.mailbox.text()
           global cnx
           imlec = cnx.cursor()
-          find_user = ("SELECT * FROM eusers WHERE username = %s AND password = %s AND mail = %s")
+          find_user = ("SELECT * FROM eusers WHERE EUsername = %s AND EUPassword = %s AND EUEMail = %s")
           imlec.execute(find_user, [(self.userbox.text()), (self.passbox.text()), (self.mailbox.text())])
           result = imlec.fetchall()
           msg = QMessageBox()
@@ -218,7 +222,7 @@ class LoginWindow:
                     msg.exec_()
                     
                     self.window.close()
-                    self.mn = SplashScreen()
+                    self.mn = LoadMenu()
                     self.mn.show()
                else:
                     msg.setText('Incorrect Password')
@@ -236,16 +240,16 @@ class LoginWindow:
                msg3.addButton("Okey", QMessageBox.YesRole)
                msg3.exec_()
           else:
-               cursor.execute("SELECT * FROM users WHERE mail = %s", self.mailbox.text())
+               cursor.execute("SELECT * FROM eusers WHERE EUEMail = %s", self.mailbox.text())
                row = cursor.fetchone()
-               cnx = pymysql.connect(user='{youruser}', password='{yourpassword}', host='{yourhost}', database='{yourdatabase}')
+               
                if row!= None:
                     msg2.setText("This email already exists")
                     msg2.setIcon(QMessageBox.Warning)
                     msg2.addButton("Okey", QMessageBox.YesRole)
                     msg2.exec_()
                else:
-                    cursor.execute("INSERT INTO users VALUES(%s, %s, %s)", (self.userbox.text(),self.passbox.text(),self.mailbox.text()))
+                    cursor.execute("INSERT INTO eusers VALUES(%s, %s, %s)", (self.userbox.text(),self.passbox.text(),self.mailbox.text()))
 
                     cnx.commit()
                     cnx.close()
@@ -257,7 +261,7 @@ class LoginWindow:
 
 if __name__ =='__main__':
      app = QApplication(sys.argv)
-     window = LoginWindow()
+     window = LoadMenu()
      app.exec_()
 
 
