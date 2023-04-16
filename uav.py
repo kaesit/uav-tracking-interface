@@ -5,8 +5,10 @@ from math import sqrt
 import datetime
 import imutils
 
-#cap = cv2.VideoCapture("testvideo5.mp4")
+
+#cap = cv2.VideoCapture("testvideo3.mp4")
 cap = cv2.VideoCapture(0)
+#cap = cv2.VideoCapture("http://192.168.0.16:8080/video")
 
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
 cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
@@ -36,10 +38,14 @@ with open(classesFile, 'rt') as f:
 modelConfiguration = 'model/yolov4-obj.cfg'
 modelWeigts = 'model/yolov4-obj_last.weights'
 
+tinyModelConfiguration = "model/face-model.cfg"
+tinyModelWeights = "model/face-model.weights"
+
 net = cv2.dnn.readNet(modelWeigts, modelConfiguration)
+#net = cv2.dnn.readNet(tinyModelWeights, tinyModelConfiguration)
 
 
-fileName = "C:/Users/PC/Desktop/Programlama/Projeler/YapayZeka/Missileme Programı/ds/op.avi"
+fileName = "C:/Users/PC/Desktop/Programlama/Projeler/YapayZeka/SİHA TAKİP PROGRAMI/videos/op.avi"
 codec = cv2.VideoWriter_fourcc('W', 'M', 'V', '2')
 frameRate = 30
 resolution = (width, height)
@@ -85,31 +91,108 @@ def findObjects(outputs, img):
         x1, y1 = x + w, y + h
 
         b1, c1 = x + h, y + w 
-        cv2.line(img, (x, y), (x + l, y), (0, 0, 255), t)
+        """cv2.line(img, (x, y), (x + l, y), (0, 0, 255), t)
         cv2.line(img, (x, y), (x, y+l), (0, 0, 255), t)
         cv2.ellipse(img, (x1 + l, y1 + rt), (rt, rt), 180, 0, 90, (0, 0, 255), t)
+
         # Top Right  x1,y
         cv2.line(img, (x1, y), (x1 - l, y), (0, 0, 255), t)
         cv2.line(img, (x1, y), (x1, y+l), (0, 0, 255), t)
+        cv2.ellipse(img, (x1 + l, y1 + rt), (rt, rt), 180, 0, 90, (0, 0, 255), t)
         # Bottom Left  x,y1
         cv2.line(img, (x, y1), (x + l, y1), (0, 0, 255), t)
         cv2.line(img, (x, y1), (x, y1 - l), (0, 0, 255), t)
+        cv2.ellipse(img, (x1 + l, y1 + rt), (rt, rt), 180, 0, 90, (0, 0, 255), t)
         # Bottom Right  x1,y1
         cv2.line(img, (x1, y1), (x1 - l, y1), (0, 0, 255), t)
           
         cv2.line(img, (x1, y1), (x1, y1 - l), (0, 0, 255), t)
+        cv2.ellipse(img, (x1 + l, y1 + rt), (rt, rt), 180, 0, 90, (0, 0, 255), t)"""
+
+        cv2.rectangle(img, (x,y),(x+w,h+y), color=(0, 0, 255), thickness=2)
+
         cv2.putText(img, f'{classNames[classIds[i - 1]].upper()} %{int(confs[i] * 100)}',
                     (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
 
 
         
         return x, y, w, h
+def returner(output, img):
+
+     returner = findObjects(output, img)
+
+     print(returner)
+     
+     if returner is not None:
+          cv2.line(img, (int(img.shape[1] / 2), int(img.shape[0] / 2)),
+                         (int(returner[0] + returner[2] / 2), int(returner[1] + returner[3] / 2)), (0, 207, 239), 2)
+          roi_img = img[returner[1]:returner[1] + returner[3], returner[0]:returner[0] + returner[2]]
+               # cv2.imshow('Image2', roi_img)
+
+               # img[0: returner[3],0: returner[2]] = roi_img
+               # roi_img2 = img[returner[1]:returner[1] + 100, returner[0]:returner[0] + 100]
+
+               # dronu daha küçük bir alanda bulmak
+               # roi_drone = img[returner[1]+100 :returner[1] + returner[3] + 100, returner[0]-100 :returner[0] + returner[2]+ 100]
+               # findObjects(outputs, roi_drone)
+
+               # cv2.imshow('Image2', roi_img2)
+
+          distance = ((returner[0] - int(img.shape[0] / 2)) ** 2 + (returner[1] - int(img.shape[0] / 2) ** 2))
+               #print(math.sqrt(distance))
+               #cv2.putText(img, "Distance:" + ('%d' % int(distance)), (200, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 200),
+                              #2, cv2.LINE_AA, False)
+
+               # sağ yada sol taraftamı ona bakan bir algoritma yaz
+               # üst taraftamı alt taraftamı ona bakan bir algoritma
+          horizantal_difference = int(returner[0] + returner[2] / 2) - int(img.shape[1] / 2)
+          if horizantal_difference  > 0:
+               print("right")
+               cv2.putText(img, "Right:"+ ('%.2f' % float((horizantal_difference)/kumanda_aralık)), (int(img.shape[1] / 4) + 5, int(9 * img.shape[0] / 10) - 150),
+                              cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 200), 2, cv2.LINE_AA, False)
+          else:
+               print("left")
+               cv2.putText(img, "Left:"+ ('%.2f' % float((horizantal_difference*-1)/kumanda_aralık)), (int(img.shape[1] / 4) + 5, int(9 * img.shape[0] / 10) - 150),
+                              cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 200), 2, cv2.LINE_AA, False)
+
+          vertical_difference = int(returner[1] + returner[3] / 2) - int(img.shape[0] / 2)
+
+          if vertical_difference > 0:
+               print("down")
+               cv2.putText(img, "Down:"+ ('%.2f' % float((vertical_difference)/kumanda_aralık)), (int(img.shape[1] / 4) + 5, int(9 * img.shape[0] / 10) - 100),
+                              cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 200), 2, cv2.LINE_AA, False)
+          else:
+               print("up")
+               cv2.putText(img, "Up:"+ ('%.2f' % float((vertical_difference*-1)/kumanda_aralık)), (int(img.shape[1] / 4) + 5, int(9 * img.shape[0] / 10) - 100),
+                              cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 200), 2, cv2.LINE_AA, False)
+
+          if int(img.shape[1] / 4)< returner[0] < int(3 * img.shape[1] / 4) and int(img.shape[0] / 10) < returner[1] < int(9 * img.shape[0] / 10):
+               print("Durum: İçeride")
+               cv2.putText(img, "Inside",
+                              (int(img.shape[1] / 4) + 5, int(9 * img.shape[0] / 10) - 250),
+                              cv2.FONT_HERSHEY_SIMPLEX, 1.5, (0, 220, 0), 2, cv2.LINE_AA, False)
+          else:
+               print("Durum: Dışarda")
+               cv2.putText(img, "Outside",
+                              (int(img.shape[1] / 4) + 5, int(9 * img.shape[0] / 10) - 250),
+                              cv2.FONT_HERSHEY_SIMPLEX, 1.5, (0, 0, 200), 2, cv2.LINE_AA, False)
+
+               #print(distance)
+               
+               
+               
+          cv2.circle(img, (int(img.shape[1] / 2), int(img.shape[0] / 2)), 3, (0, 207, 239), 2)
+               
+          cv2.circle(img, (int(returner[0] + returner[2] / 2), int(returner[1] + returner[3] / 2)), 3, (0, 207, 239), 2)
+               
+          
 
 
 def Start():
      while True:
           success, frame = cap.read()
      
+
           gray_video = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
      
           blob = cv2.dnn.blobFromImage(frame, 1 / 255, (whT, whT), [0, 0, 0], 1, crop=False)
@@ -134,85 +217,24 @@ def Start():
 
           findObjects(outputs, frame)
 
-          returner = findObjects(outputs, frame)
-
-          print(returner)
-
-          if returner is not None:
-               cv2.line(frame, (int(frame.shape[1] / 2), int(frame.shape[0] / 2)),
-                         (int(returner[0] + returner[2] / 2), int(returner[1] + returner[3] / 2)), (0, 255, 0), 2)
-               roi_frame = frame[returner[1]:returner[1] + returner[3], returner[0]:returner[0] + returner[2]]
-               # cv2.imshow('Image2', roi_frame)
-
-               # frame[0: returner[3],0: returner[2]] = roi_frame
-               # roi_frame2 = frame[returner[1]:returner[1] + 100, returner[0]:returner[0] + 100]
-
-               # dronu daha küçük bir alanda bulmak
-               # roi_drone = frame[returner[1]+100 :returner[1] + returner[3] + 100, returner[0]-100 :returner[0] + returner[2]+ 100]
-               # findObjects(outputs, roi_drone)
-
-               # cv2.imshow('Image2', roi_frame2)
-
-               distance = ((returner[0] - int(frame.shape[0] / 2)) ** 2 + (returner[1] - int(frame.shape[0] / 2) ** 2))
-               #print(math.sqrt(distance))
-               #cv2.putText(frame, "Distance:" + ('%d' % int(distance)), (200, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 200),
-                              #2, cv2.LINE_AA, False)
-
-               # sağ yada sol taraftamı ona bakan bir algoritma yaz
-               # üst taraftamı alt taraftamı ona bakan bir algoritma
-               horizantal_difference = int(returner[0] + returner[2] / 2) - int(frame.shape[1] / 2)
-               if horizantal_difference  > 0:
-                    print("right")
-                    cv2.putText(frame, "Right:"+ ('%.2f' % float((horizantal_difference)/kumanda_aralık)), (int(frame.shape[1] / 4) + 5, int(9 * frame.shape[0] / 10) - 150),
-                              cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 200), 2, cv2.LINE_AA, False)
-               else:
-                    print("left")
-                    cv2.putText(frame, "Left:"+ ('%.2f' % float((horizantal_difference*-1)/kumanda_aralık)), (int(frame.shape[1] / 4) + 5, int(9 * frame.shape[0] / 10) - 150),
-                              cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 200), 2, cv2.LINE_AA, False)
-
-               vertical_difference = int(returner[1] + returner[3] / 2) - int(frame.shape[0] / 2)
-
-               if vertical_difference > 0:
-                    print("down")
-                    cv2.putText(frame, "Down:"+ ('%.2f' % float((vertical_difference)/kumanda_aralık)), (int(frame.shape[1] / 4) + 5, int(9 * frame.shape[0] / 10) - 100),
-                              cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 200), 2, cv2.LINE_AA, False)
-               else:
-                    print("up")
-                    cv2.putText(frame, "Up:"+ ('%.2f' % float((vertical_difference*-1)/kumanda_aralık)), (int(frame.shape[1] / 4) + 5, int(9 * frame.shape[0] / 10) - 100),
-                              cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 200), 2, cv2.LINE_AA, False)
-
-               if int(frame.shape[1] / 4)< returner[0] < int(3 * frame.shape[1] / 4) and int(frame.shape[0] / 10) < returner[1] < int(9 * frame.shape[0] / 10):
-                    print("içerdeee")
-                    cv2.putText(frame, "Inside",
-                              (int(frame.shape[1] / 4) + 5, int(9 * frame.shape[0] / 10) - 250),
-                              cv2.FONT_HERSHEY_SIMPLEX, 1.5, (0, 220, 0), 2, cv2.LINE_AA, False)
-               else:
-                    print("dışarda")
-                    cv2.putText(frame, "Outside",
-                              (int(frame.shape[1] / 4) + 5, int(9 * frame.shape[0] / 10) - 250),
-                              cv2.FONT_HERSHEY_SIMPLEX, 1.5, (0, 0, 200), 2, cv2.LINE_AA, False)
-
-               print(distance)
-               
-               
-               
-               cv2.circle(frame, (int(frame.shape[1] / 2), int(frame.shape[0] / 2)), 3, (0, 0, 0), 2)
-               
-               cv2.circle(frame, (int(returner[0] + returner[2] / 2), int(returner[1] + returner[3] / 2)), 3, (0, 0, 255), 2)
-               
-          
+          returner(outputs, frame)
 
           
-          
-          cv2.imshow('Image', frame)
 
-          videoFileOutput.write(frame) 
+          cv2.imshow("Frame", frame)
+          FPS = cap.get(cv2.CAP_PROP_FPS)
+          print(FPS)
           
           key = cv2.waitKey(1) & 0xFF
           if key == ord("q"):
                break
+               
+          
 
      cap.release()
      videoFileOutput.release()
-     
+
      cv2.destroyAllWindows()
+     
+     
+     

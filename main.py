@@ -3,6 +3,9 @@ from PySide2.QtCore import *
 from PySide2.QtGui import *
 from PySide2.QtWidgets import *
 
+from plyer import notification
+
+
 
 #?PySide6
 import platform
@@ -15,9 +18,9 @@ from PySide2.QtQml import QQmlApplicationEngine
 
 from requests import cookies
 
-from themes.ui_splash_screen import Ui_SplashScreen
+from templates.ui_splash_screen import Ui_SplashScreen
 
-from themes.ui_main_window import Ui_MainWindow
+from templates.ui_main_window import Ui_MainWindow
 
 import uav
 
@@ -26,7 +29,7 @@ import pymysql
 import webbrowser  
 
 
-cnx = pymysql.connect(user='', password='', host='', database='')
+cnx = pymysql.connect(user='root', password='esadphpmyadmin', host='localhost', database='blogdb')
 
 cursor = cnx.cursor()
 
@@ -37,6 +40,7 @@ kontrol = True
 class MainWindow(QMainWindow):
      def __init__(self):
           QMainWindow.__init__(self)
+          
           self.ui = Ui_MainWindow()
           self.ui.setupUi(self)
 
@@ -53,13 +57,22 @@ class MainWindow(QMainWindow):
 
           self.center()
 
+          
+
 
           self.ui.btnMissile.clicked.connect(self.connect_to_ai)
           self.ui.btnLogout.clicked.connect(self.close_all_windows)
           self.ui.btnLink.clicked.connect(self.contact_us)
           self.show()
      def connect_to_ai(self):
+          notification.notify(
+               title = "SİSTEM GERİ BİLDİRİMİ",
+               message = "AV PROGRAMI BAŞLADI",
+               timeout = 3,
+               app_icon = r"icons/PlaneIcon2.ico"
+               )
           uav.Start()
+         
           #pass
      
      def close_all_windows(self):
@@ -132,7 +145,7 @@ class ControlStation:
      def __init__(self):
           self.window = QWidget()
           self.window.setFixedSize(330, 160)
-          self.window.setWindowTitle("Missile Tracking Verify Form")
+          self.window.setWindowTitle("Control Station")
           self.window.setStyleSheet("""
                QWidget{
                     background-color:#191919;
@@ -149,19 +162,19 @@ class ControlStation:
           self.passbox.setPlaceholderText("Password")
           self.mailbox.setPlaceholderText("EMail")
 
-          self.userbox.setStyleSheet(open("qss/lineEdit.qss", "r").read())
-          self.passbox.setStyleSheet(open("qss/lineEdit.qss", "r").read())
-          self.mailbox.setStyleSheet(open("qss/lineEdit.qss", "r").read())
+          self.userbox.setStyleSheet(open("theme/lineEdit.qss", "r").read())
+          self.passbox.setStyleSheet(open("theme/lineEdit.qss", "r").read())
+          self.mailbox.setStyleSheet(open("theme/lineEdit.qss", "r").read())
 
           self.passbox.setEchoMode(QLineEdit.Password)
 
           self.btn = QPushButton("Login")
 
-          self.btn.setStyleSheet(open("qss/custombutton.qss", "r").read())
+          self.btn.setStyleSheet(open("theme/custombutton.qss", "r").read())
 
           self.btnregister = QPushButton("Register")
 
-          self.btnregister.setStyleSheet(open("qss/custombutton.qss", "r").read())
+          self.btnregister.setStyleSheet(open("theme/custombutton.qss", "r").read())
 
 
 
@@ -172,6 +185,8 @@ class ControlStation:
           self.passlabel = QLabel("Password:")
           self.passlabel.setObjectName("passlbl")
           self.maillabel = QLabel("EMail: ")
+
+          self.title_label = QLabel("Control Station")
 
 
           self.btn.clicked.connect(self.check_password)
@@ -202,7 +217,7 @@ class ControlStation:
           mailel = self.mailbox.text()
           global cnx
           imlec = cnx.cursor()
-          find_user = ("SELECT * FROM  WHERE  = %s AND  = %s AND  = %s")
+          find_user = ("SELECT * FROM eusers WHERE EUsername = %s AND EUPassword = %s AND EUEMail = %s")
           imlec.execute(find_user, [(self.userbox.text()), (self.passbox.text()), (self.mailbox.text())])
           result = imlec.fetchall()
           msg = QMessageBox()
@@ -240,7 +255,7 @@ class ControlStation:
                msg3.addButton("Okey", QMessageBox.YesRole)
                msg3.exec_()
           else:
-               cursor.execute("SELECT * FROM  WHERE  = %s", self.mailbox.text())
+               cursor.execute("SELECT * FROM eusers WHERE EUEMail = %s", self.mailbox.text())
                row = cursor.fetchone()
                
                if row!= None:
@@ -249,7 +264,7 @@ class ControlStation:
                     msg2.addButton("Okey", QMessageBox.YesRole)
                     msg2.exec_()
                else:
-                    cursor.execute("INSERT INTO  VALUES(%s, %s, %s)", (self.userbox.text(),self.passbox.text(),self.mailbox.text()))
+                    cursor.execute("INSERT INTO eusers VALUES(%s, %s, %s)", (self.userbox.text(),self.passbox.text(),self.mailbox.text()))
 
                     cnx.commit()
                     cnx.close()
