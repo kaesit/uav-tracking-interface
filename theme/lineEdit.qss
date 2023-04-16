@@ -1,0 +1,7 @@
+QLineEdit{
+     background-color:#191919;
+     border:none;
+     border-bottom: 2px solid rgba(105, 118, 132, 255);
+     color:rgba(255, 255, 255, 230);
+     padding-bottom: 5px;
+}
