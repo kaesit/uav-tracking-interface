@@ -29,7 +29,7 @@ import pymysql
 import webbrowser  
 
 
-cnx = pymysql.connect(user='root', password='esadphpmyadmin', host='localhost', database='blogdb')
+cnx = pymysql.connect(user='root', password='password', host='localhost', database='blogdb')
 
 cursor = cnx.cursor()
 
